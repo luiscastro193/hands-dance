@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title>Dots move</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="icon" href="https://luiscastro193.github.io/favicon.svg" type="image/svg+xml">
+	<script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" defer></script>
+	<script src="main.js" defer></script>
+	<style>
+		body {
+			background-color: black;
+		}
+		video, canvas {
+			position: fixed;
+			top: 0; right: 0; bottom: 0; left: 0;
+			width: 100%;
+			height: 100%;
+			object-fit: contain;
+			transform: scaleX(-1);
+		}
+	</style>
+</head>
+<body>
+	<video playsinline autoplay></video>
+	<canvas></canvas>
+</body>
+</html>
