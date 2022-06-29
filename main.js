@@ -1,5 +1,5 @@
 "use strict";
-function getHandPolygons(handResults, settings) {
+function getHandRects(handResults, settings) {
 	return handResults.multiHandLandmarks.map(landmarks => {
 		let x = landmarks.map(mark => mark.x);
 		let y = landmarks.map(mark => mark.y);
@@ -8,22 +8,15 @@ function getHandPolygons(handResults, settings) {
 		let y_max = Math.max(...y) * settings.height;
 		let y_min = Math.min(...y) * settings.height;
 		
-		return [[x_min, y_min], [x_max, y_min], [x_max, y_max], [x_min, y_max]];
+		return [x_min, y_min, x_max - x_min, y_max - y_min];
 	})
 }
 
 function drawHands(handResults, ctx, settings) {
 	ctx.clearRect(0, 0, settings.width, settings.height);
 	
-	for (let polygon of getHandPolygons(handResults, settings)) {
-		ctx.beginPath();
-		ctx.moveTo(...polygon[0]);
-		ctx.lineTo(...polygon[1]);
-		ctx.lineTo(...polygon[2]);
-		ctx.lineTo(...polygon[3]);
-		ctx.closePath();
-		ctx.stroke();
-	}
+	for (let rect of getHandRects(handResults, settings))
+		ctx.strokeRect(...rect);
 }
 
 navigator.mediaDevices.getUserMedia({audio: false, video: true}).then(stream => {
