@@ -19,7 +19,7 @@ function drawHands(handResults, ctx, settings) {
 		ctx.strokeRect(...rect);
 }
 
-navigator.mediaDevices.getUserMedia({audio: false, video: true}).then(stream => {
+navigator.mediaDevices.getUserMedia({audio: false, video: {height: {min: 720}}}).then(stream => {
 	const video = document.querySelector('video');
 	const canvas = document.querySelector('canvas');
 	const ctx = canvas.getContext('2d');
