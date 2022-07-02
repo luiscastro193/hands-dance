@@ -65,8 +65,8 @@ class Ball {
 	}
 	
 	collisionDirection(rect) {
-		this.dx = this.x - rect[0] + rect[2] / 2;
-		this.dy = this.y - rect[1] + rect[3] / 2;
+		this.dx = this.x - (rect[0] + rect[2] / 2);
+		this.dy = this.y - (rect[1] + rect[3] / 2);
 		let factor = this.speed / Math.sqrt(this.dx * this.dx + this.dy * this.dy);
 		this.dx *= factor;
 		this.dy *= factor;
