@@ -16,7 +16,7 @@ class HandRects {
 		this.rects = [];
 		
 		this.hands = new Hands({locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-		this.hands.setOptions({modelComplexity: 1, maxNumHands: 4});
+		this.hands.setOptions({modelComplexity: 0, maxNumHands: 4});
 		this.hands.onResults(results => this.update(results));
 		
 		async function sendImage() {
@@ -101,7 +101,7 @@ class Ball {
 	}
 }
 
-navigator.mediaDevices.getUserMedia({audio: false, video: {width: 1280, height: 720}}).then(stream => {
+navigator.mediaDevices.getUserMedia({audio: false, video: {width: 852, height: 480}}).then(stream => {
 	const video = document.querySelector('video');
 	const canvas = document.querySelector('canvas');
 	const ctx = canvas.getContext('2d');
