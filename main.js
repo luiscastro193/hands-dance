@@ -52,13 +52,13 @@ class Ball {
 	constructor(hands, ctx, settings) {
 		this.hands = hands;
 		this.ctx = ctx;
-		this.diagonal = Math.sqrt(settings.width * settings.width + settings.height * settings.height);
-		this.radius = this.diagonal / 40;
+		let diagonal = Math.sqrt(settings.width * settings.width + settings.height * settings.height);
+		this.radius = diagonal / 40;
 		this.x = settings.width / 2;
 		this.y = settings.height / 2;
 		this.dx = 0;
 		this.dy = 0;
-		this.speed = this.diagonal / 2000;
+		this.speed = diagonal / 2000;
 		this.rightLimit = settings.width - this.radius;
 		this.bottomLimit = settings.height - this.radius;
 		this.lastTime = performance.now();
