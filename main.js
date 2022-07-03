@@ -5,7 +5,7 @@ const drawElements = []
 function areColliding(rect, circle) {
 	let deltaX = Math.abs(circle.x - Math.max(rect[0], Math.min(circle.x, rect[0] + rect[2])));
 	let deltaY = Math.abs(circle.y - Math.max(rect[1], Math.min(circle.y, rect[1] + rect[3])));
-	return deltaX <= circle.radius && deltaY <= circle.radius && (deltaX * deltaX + deltaY * deltaY) <= (circle.radius * circle.radius);
+	return deltaX <= circle.radius && deltaY <= circle.radius && (deltaX * deltaX + deltaY * deltaY) <= circle.radiusSqr;
 }
 
 class HandRects {
@@ -59,6 +59,7 @@ class Ball {
 		this.dx = 0;
 		this.dy = 0;
 		this.speed = diagonal / 2000;
+		this.radiusSqr = this.radius * this.radius;
 		this.rightLimit = settings.width - this.radius;
 		this.bottomLimit = settings.height - this.radius;
 		this.lastTime = performance.now();
