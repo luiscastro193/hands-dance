@@ -118,7 +118,6 @@ drawElements.push(hands);
 
 navigator.mediaDevices.getUserMedia({audio: false, video: {width: 852, height: 480}}).then(stream => {
 	const settings = stream.getVideoTracks()[0].getSettings();
-	
 	canvas.width = settings.width;
 	canvas.height = settings.height;
 	drawElements.push(new Ball(hands, ctx, settings));
