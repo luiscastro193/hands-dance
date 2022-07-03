@@ -14,6 +14,8 @@ class HandRects {
 		this.ctx = ctx;
 		this.settings = settings;
 		this.rects = [];
+		let readyResolve;
+		this.ready = new Promise(resolve => readyResolve = resolve);
 		
 		this.hands = new Hands({locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
 		this.hands.setOptions({modelComplexity: 0, maxNumHands: 4});
@@ -21,6 +23,7 @@ class HandRects {
 		
 		async function sendImage() {
 			await self.hands.send({image: video});
+			readyResolve();
 			requestAnimationFrame(sendImage);	
 		}
 		
@@ -111,17 +114,18 @@ navigator.mediaDevices.getUserMedia({audio: false, video: {width: 852, height: 4
 	canvas.width = settings.width;
 	canvas.height = settings.height;
 	
-	video.addEventListener('play', function() {
+	video.addEventListener('play', async function() {
 		let hands = new HandRects(video, ctx, settings);
 		drawElements.push(hands);
 		drawElements.push(new Ball(hands, ctx, settings));
 		
-		async function draw(time) {
+		function draw(time) {
 			ctx.clearRect(0, 0, settings.width, settings.height);
 			drawElements.filter(element => element.draw(time));
 			requestAnimationFrame(draw);	
 		}
 		
+		await hands.ready;
 		requestAnimationFrame(draw);
 	}, {once: true});
 	
