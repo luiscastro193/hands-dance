@@ -8,7 +8,7 @@ function areColliding(rect, circle) {
 	return deltaX <= circle.radius && deltaY <= circle.radius && (deltaX * deltaX + deltaY * deltaY) <= (circle.radius * circle.radius);
 }
 
-class HandRects { 
+class HandRects {
 	constructor(video, ctx, settings) {
 		const self = this;
 		this.ctx = ctx;
