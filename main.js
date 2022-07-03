@@ -15,19 +15,26 @@ class HandRects {
 	constructor(video, canvas, ctx) {
 		this.ctx = ctx;
 		this.rects = [];
-		let readyResolve;
-		this.ready = new Promise(resolve => readyResolve = resolve);
+		let readyResolve, readyReject;
+		this.ready = new Promise((resolve, reject) => [readyResolve, readyReject] = [resolve, reject]);
 		
 		this.hands = new Hands({locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
 		this.hands.setOptions({modelComplexity: 0, maxNumHands: 4});
-		this.hands.send({image: canvas}).then(readyResolve);
+		this.hands.send({image: canvas}).then(readyResolve).catch(readyReject);
 	}
 	
 	async start(settings) {
 		const self = this;
 		this.settings = settings;
 		
-		await this.ready;
+		try {
+			await this.ready;
+		}
+		catch(e) {
+			ctx.fillStyle = "red";
+			return console.error(e);
+		}
+		
 		this.hands.onResults(results => this.update(results));
 		
 		async function sendImage() {
