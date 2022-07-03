@@ -1,6 +1,9 @@
 "use strict";
 const PI2 = Math.PI * 2;
 const drawElements = []
+const video = document.querySelector('video');
+const canvas = document.querySelector('canvas');
+const ctx = canvas.getContext('2d');
 
 function areColliding(rect, circle) {
 	let deltaX = Math.abs(circle.x - Math.max(rect[0], Math.min(circle.x, rect[0] + rect[2])));
@@ -9,21 +12,26 @@ function areColliding(rect, circle) {
 }
 
 class HandRects {
-	constructor(video, ctx, settings) {
-		const self = this;
+	constructor(video, canvas, ctx) {
 		this.ctx = ctx;
-		this.settings = settings;
 		this.rects = [];
 		let readyResolve;
 		this.ready = new Promise(resolve => readyResolve = resolve);
 		
 		this.hands = new Hands({locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
 		this.hands.setOptions({modelComplexity: 0, maxNumHands: 4});
+		this.hands.send({image: canvas}).then(readyResolve);
+	}
+	
+	async start(settings) {
+		const self = this;
+		this.settings = settings;
+		
+		await this.ready;
 		this.hands.onResults(results => this.update(results));
 		
 		async function sendImage() {
 			await self.hands.send({image: video});
-			readyResolve();
 			requestAnimationFrame(sendImage);	
 		}
 		
@@ -105,18 +113,16 @@ class Ball {
 	}
 }
 
+const hands = new HandRects(video, canvas, ctx);
+drawElements.push(hands);
+
 navigator.mediaDevices.getUserMedia({audio: false, video: {width: 852, height: 480}}).then(stream => {
-	const video = document.querySelector('video');
-	const canvas = document.querySelector('canvas');
-	const ctx = canvas.getContext('2d');
 	const settings = stream.getVideoTracks()[0].getSettings();
 	
 	canvas.width = settings.width;
 	canvas.height = settings.height;
 	
 	video.addEventListener('play', async function() {
-		let hands = new HandRects(video, ctx, settings);
-		drawElements.push(hands);
 		drawElements.push(new Ball(hands, ctx, settings));
 		
 		function draw(time) {
@@ -125,7 +131,7 @@ navigator.mediaDevices.getUserMedia({audio: false, video: {width: 852, height: 4
 			requestAnimationFrame(draw);	
 		}
 		
-		await hands.ready;
+		await hands.start(settings);
 		requestAnimationFrame(draw);
 	}, {once: true});
 	
