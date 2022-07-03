@@ -1,4 +1,4 @@
 # hands-dance
-AR game
+AR game: https://luiscastro193.github.io/hands-dance/
 
 Recommended browser: Google Chrome
