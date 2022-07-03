@@ -3,12 +3,12 @@ const PI2 = Math.PI * 2;
 const drawElements = []
 
 function areColliding(rect, circle) {
-	let deltaX = circle.x - Math.max(rect[0], Math.min(circle.x, rect[0] + rect[2]));
-	let deltaY = circle.y - Math.max(rect[1], Math.min(circle.y, rect[1] + rect[3]));
-	return (deltaX * deltaX + deltaY * deltaY) < (circle.radius * circle.radius);
+	let deltaX = Math.abs(circle.x - Math.max(rect[0], Math.min(circle.x, rect[0] + rect[2])));
+	let deltaY = Math.abs(circle.y - Math.max(rect[1], Math.min(circle.y, rect[1] + rect[3])));
+	return deltaX <= circle.radius && deltaY <= circle.radius && (deltaX * deltaX + deltaY * deltaY) <= (circle.radius * circle.radius);
 }
 
-class HandRects {
+class HandRects { 
 	constructor(video, ctx, settings) {
 		const self = this;
 		this.ctx = ctx;
