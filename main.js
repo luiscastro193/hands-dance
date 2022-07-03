@@ -121,10 +121,9 @@ navigator.mediaDevices.getUserMedia({audio: false, video: {width: 852, height: 4
 	
 	canvas.width = settings.width;
 	canvas.height = settings.height;
+	drawElements.push(new Ball(hands, ctx, settings));
 	
 	video.addEventListener('play', async function() {
-		drawElements.push(new Ball(hands, ctx, settings));
-		
 		function draw(time) {
 			ctx.clearRect(0, 0, settings.width, settings.height);
 			drawElements.filter(element => element.draw(time));
