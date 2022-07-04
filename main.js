@@ -1,6 +1,6 @@
 "use strict";
 const PI2 = Math.PI * 2;
-const drawElements = []
+const drawElements = [];
 const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
