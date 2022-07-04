@@ -17,7 +17,12 @@ class HandRects {
 		this.rects = [];
 		
 		this.hands = new Hands({locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-		this.hands.setOptions({modelComplexity: 0, maxNumHands: 4});
+		this.hands.setOptions({
+			modelComplexity: 0,
+			maxNumHands: 4,
+			minDetectionConfidence: 0.3,
+			minTrackingConfidence: 0.2
+		});
 		this.ready = this.hands.send({image: canvas});
 	}
 	
