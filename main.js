@@ -127,12 +127,12 @@ const hands = new HandRects(video, canvas, ctx);
 drawElements.push(hands);
 
 navigator.mediaDevices.getUserMedia({audio: false, video: {width: 1280, height: 720}}).then(stream => {
-	const settings = stream.getVideoTracks()[0].getSettings();
-	canvas.width = settings.width;
-	canvas.height = settings.height;
-	drawElements.push(new Ball(hands, ctx, settings));
-	
 	video.addEventListener('play', async function() {
+		const settings = stream.getVideoTracks()[0].getSettings();
+		canvas.width = settings.width;
+		canvas.height = settings.height;
+		drawElements.push(new Ball(hands, ctx, settings));
+		
 		function draw(time) {
 			ctx.clearRect(0, 0, settings.width, settings.height);
 			drawElements.filter(element => element.draw(time));
