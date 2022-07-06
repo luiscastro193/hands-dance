@@ -34,7 +34,7 @@ class HandRects {
 			await this.ready;
 		}
 		catch(e) {
-			ctx.fillStyle = "red";
+			this.ctx.fillStyle = "red";
 			return console.error(e);
 		}
 		
@@ -86,6 +86,10 @@ class Ball {
 		this.lastTime = performance.now();
 	}
 	
+	randomColor() {
+		this.ctx.fillStyle = '#' + Math.floor(Math.random()*16777215).toString(16);
+	}
+	
 	collisionDirection(rect) {
 		this.dx = this.x - (rect[0] + rect[2] / 2);
 		this.dy = this.y - (rect[1] + rect[3] / 2);
@@ -95,16 +99,28 @@ class Ball {
 	}
 	
 	detectCollisions() {
-		if (this.dx < 0 && this.x <= this.radius || this.dx > 0 && this.x >= this.rightLimit)
-			this.dx = -this.dx;
+		let collision = false;
 		
-		if (this.dy < 0 && this.y <= this.radius || this.dy > 0 && this.y >= this.bottomLimit)
+		if (this.dx < 0 && this.x <= this.radius || this.dx > 0 && this.x >= this.rightLimit) {
+			this.dx = -this.dx;
+			collision = true;
+		}
+		
+		if (this.dy < 0 && this.y <= this.radius || this.dy > 0 && this.y >= this.bottomLimit) {
 			this.dy = -this.dy;
+			collision = true;
+		}
 		
 		for (let handRect of this.hands.rects) {
-			if (areColliding(handRect, this))
-				return this.collisionDirection(handRect);
+			if (areColliding(handRect, this)) {
+				this.collisionDirection(handRect);
+				collision = true;
+				break;
+			}
 		}
+		
+		if (collision)
+			this.randomColor();
 	}
 	
 	draw(time) {
