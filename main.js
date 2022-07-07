@@ -99,6 +99,11 @@ class Ball {
 	}
 	
 	detectCollisions() {
+		for (let handRect of this.hands.rects) {
+			if (areColliding(handRect, this))
+				return this.collisionDirection(handRect);
+		}
+		
 		let newColor = false;
 		
 		if (this.dx < 0 && this.x <= this.radius || this.dx > 0 && this.x >= this.rightLimit) {
@@ -113,11 +118,6 @@ class Ball {
 		
 		if (newColor)
 			this.changeColor();
-		
-		for (let handRect of this.hands.rects) {
-			if (areColliding(handRect, this))
-				return this.collisionDirection(handRect);
-		}
 	}
 	
 	draw(time) {
