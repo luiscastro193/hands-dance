@@ -69,6 +69,8 @@ class HandRects {
 	}
 }
 
+const maxColor = 0xFFFFFF + 1;
+
 class Ball {
 	constructor(hands, ctx, settings) {
 		this.hands = hands;
@@ -87,7 +89,7 @@ class Ball {
 	}
 	
 	changeColor() {
-		this.ctx.fillStyle = '#' + Math.trunc(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0');
+		this.ctx.fillStyle = '#' + Math.trunc(Math.random() * maxColor).toString(16).padStart(6, '0');
 	}
 	
 	collisionDirection(rect) {
