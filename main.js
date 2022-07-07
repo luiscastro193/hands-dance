@@ -86,6 +86,10 @@ class Ball {
 		this.lastTime = performance.now();
 	}
 	
+	changeColor() {
+		this.ctx.fillStyle = '#' + Math.trunc(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0');
+	}
+	
 	collisionDirection(rect) {
 		this.dx = this.x - (rect[0] + rect[2] / 2);
 		this.dy = this.y - (rect[1] + rect[3] / 2);
@@ -95,11 +99,20 @@ class Ball {
 	}
 	
 	detectCollisions() {
-		if (this.dx < 0 && this.x <= this.radius || this.dx > 0 && this.x >= this.rightLimit)
-			this.dx = -this.dx;
+		let newColor = false;
 		
-		if (this.dy < 0 && this.y <= this.radius || this.dy > 0 && this.y >= this.bottomLimit)
+		if (this.dx < 0 && this.x <= this.radius || this.dx > 0 && this.x >= this.rightLimit) {
+			this.dx = -this.dx;
+			newColor = true;
+		}
+		
+		if (this.dy < 0 && this.y <= this.radius || this.dy > 0 && this.y >= this.bottomLimit) {
 			this.dy = -this.dy;
+			newColor = true;
+		}
+		
+		if (newColor)
+			this.changeColor();
 		
 		for (let handRect of this.hands.rects) {
 			if (areColliding(handRect, this))
@@ -108,16 +121,19 @@ class Ball {
 	}
 	
 	draw(time) {
-		this.ctx.beginPath();
-		this.ctx.arc(this.x, this.y, this.radius, 0, PI2);
-		this.ctx.fill();
-		
-		this.detectCollisions();
-		
 		let timeDiff = time - this.lastTime;
 		this.x += this.dx * timeDiff;
 		this.y += this.dy * timeDiff;
 		this.lastTime = time;
+		
+		this.x = Math.min(Math.max(this.radius, this.x), this.rightLimit);
+		this.y = Math.min(Math.max(this.radius, this.y), this.bottomLimit);
+		
+		this.detectCollisions();
+		
+		this.ctx.beginPath();
+		this.ctx.arc(this.x, this.y, this.radius, 0, PI2);
+		this.ctx.fill();
 		
 		return true;
 	}
