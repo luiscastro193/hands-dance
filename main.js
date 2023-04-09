@@ -4,6 +4,7 @@ const drawElements = [];
 const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
+const actx = new AudioContext();
 
 function areColliding(rect, circle) {
 	let deltaX = Math.abs(circle.x - Math.max(rect[0], Math.min(circle.x, rect[0] + rect[2])));
@@ -71,6 +72,13 @@ class HandRects {
 
 const maxColor = 0xFFFFFF + 1;
 
+function playSound() {
+	let oscillator = actx.createOscillator();
+	oscillator.connect(actx.destination);
+	oscillator.start();
+	oscillator.stop(actx.currentTime + .1);
+}
+
 class Ball {
 	constructor(hands, ctx, settings) {
 		this.hands = hands;
@@ -118,8 +126,10 @@ class Ball {
 			newColor = true;
 		}
 		
-		if (newColor)
+		if (newColor) {
 			this.changeColor();
+			playSound();
+		}
 	}
 	
 	draw(time) {
