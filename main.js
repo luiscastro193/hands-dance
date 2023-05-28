@@ -76,7 +76,7 @@ function playSound() {
 	let oscillator = actx.createOscillator();
 	oscillator.connect(actx.destination);
 	oscillator.start();
-	oscillator.stop(actx.currentTime + .1);
+	oscillator.stop(actx.currentTime + .05);
 }
 
 class Ball {
