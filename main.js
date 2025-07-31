@@ -75,13 +75,15 @@ const durationDeviation = .025;
 let randomDuration = () => durationMean;
 
 import('https://cdn.jsdelivr.net/npm/cephes/+esm').then(async module => {
+	const shape = (durationMean / durationDeviation) ** 2;
+	const scale = durationDeviation ** 2 / durationMean;
 	const cephes = module.default;
 	await cephes.compiled;
 	
 	randomDuration = () => {
 		let uniform;
 		while ((uniform = Math.random()) === 0);
-		return Math.max(durationMean + durationDeviation * cephes.ndtri(uniform), 0);
+		return scale * cephes.igami(shape, uniform);
 	};
 });
 
