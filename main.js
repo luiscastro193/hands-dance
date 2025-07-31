@@ -1,4 +1,6 @@
 "use strict";
+import cephes from 'https://cdn.jsdelivr.net/npm/cephes/+esm';
+
 const PI2 = Math.PI * 2;
 const drawElements = [];
 const video = document.querySelector('video');
@@ -72,11 +74,19 @@ class HandRects {
 
 const maxColor = 0xFFFFFF + 1;
 
+await cephes.compiled;
+
+function randomDuration(mean = .075, deviation = .025) {
+	let uniform;
+	while ((uniform = Math.random()) === 0);
+	return Math.max(mean + deviation * cephes.ndtri(uniform), 0);
+}
+
 function playSound() {
 	let oscillator = actx.createOscillator();
 	oscillator.connect(actx.destination);
 	oscillator.start();
-	oscillator.stop(actx.currentTime + .05);
+	oscillator.stop(actx.currentTime + randomDuration());
 }
 
 class Ball {
