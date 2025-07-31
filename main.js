@@ -70,26 +70,29 @@ class HandRects {
 	}
 }
 
-const maxColor = 0xFFFFFF + 1;
-let playSound = () => {};
+const durationMean = .075;
+const durationDeviation = .025;
+let randomDuration = () => durationMean;
 
 import('https://cdn.jsdelivr.net/npm/cephes/+esm').then(async module => {
 	const cephes = module.default;
 	await cephes.compiled;
 	
-	function randomDuration(mean = .075, deviation = .025) {
+	randomDuration = () => {
 		let uniform;
 		while ((uniform = Math.random()) === 0);
-		return Math.max(mean + deviation * cephes.ndtri(uniform), 0);
-	}
-	
-	playSound = () => {
-		let oscillator = actx.createOscillator();
-		oscillator.connect(actx.destination);
-		oscillator.start();
-		oscillator.stop(actx.currentTime + randomDuration());
+		return Math.max(durationMean + durationDeviation * cephes.ndtri(uniform), 0);
 	};
 });
+
+function playSound() {
+	let oscillator = actx.createOscillator();
+	oscillator.connect(actx.destination);
+	oscillator.start();
+	oscillator.stop(actx.currentTime + randomDuration());
+}
+
+const maxColor = 0xFFFFFF + 1;
 
 class Ball {
 	constructor(hands, ctx, settings) {
