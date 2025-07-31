@@ -70,20 +70,32 @@ class HandRects {
 	}
 }
 
-const durationMean = .075;
+const durationMean = .1;
 const durationDeviation = .025;
 let randomDuration = () => durationMean;
 
 import('https://cdn.jsdelivr.net/npm/cephes/+esm').then(async module => {
 	const shape = (durationMean / durationDeviation) ** 2;
 	const scale = durationDeviation ** 2 / durationMean;
+	const d = shape - 1 / 3;
+	const c = 1 / Math.sqrt(9 * d);
 	const cephes = module.default;
 	await cephes.compiled;
 	
+	// Marsaglia-Tsang gamma
 	randomDuration = () => {
-		let uniform;
-		while ((uniform = Math.random()) === 0);
-		return scale * cephes.igami(shape, uniform);
+		while (true) {
+			const uniform = Math.random();
+			if (uniform === 0) continue;
+			const x = cephes.ndtri(uniform);
+			let v = 1 + c * x;
+			if (v <= 0) continue;
+			v = v ** 3;
+			const u = Math.random();
+			
+			if (u < 1 - .0331 * x ** 4 || Math.log(u) < .5 * x ** 2 + d * (1 - v + Math.log(v)))
+				return scale * d * v;
+		}
 	};
 });
 
