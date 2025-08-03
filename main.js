@@ -1,10 +1,10 @@
 "use strict";
 const PI2 = Math.PI * 2;
-const drawElements = [];
 const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 const actx = new AudioContext();
+let drawObjects = [];
 
 function areColliding(rect, circle) {
 	let deltaX = Math.abs(circle.x - Math.max(rect[0], Math.min(circle.x, rect[0] + rect[2])));
@@ -101,7 +101,6 @@ class Ball {
 		this.radiusSqr = this.radius * this.radius;
 		this.rightLimit = settings.width - this.radius;
 		this.bottomLimit = settings.height - this.radius;
-		this.lastTime = performance.now();
 	}
 	
 	changeColor() {
@@ -141,10 +140,8 @@ class Ball {
 	}
 	
 	draw(time) {
-		let timeDiff = time - this.lastTime;
-		this.x += this.dx * timeDiff;
-		this.y += this.dy * timeDiff;
-		this.lastTime = time;
+		this.x += this.dx * time;
+		this.y += this.dy * time;
 		
 		this.x = Math.min(Math.max(this.radius, this.x), this.rightLimit);
 		this.y = Math.min(Math.max(this.radius, this.y), this.bottomLimit);
@@ -160,18 +157,22 @@ class Ball {
 }
 
 const hands = new HandRects(video, canvas, ctx);
-drawElements.push(hands);
+drawObjects.push(hands);
 
 navigator.mediaDevices.getUserMedia({audio: false, video: {width: 1280, height: 720}}).then(stream => {
 	video.addEventListener('play', async function() {
 		const settings = stream.getVideoTracks()[0].getSettings();
 		canvas.width = settings.width;
 		canvas.height = settings.height;
-		drawElements.push(new Ball(hands, ctx, settings));
+		drawObjects.push(new Ball(hands, ctx, settings));
+		
+		let lastTime = performance.now();
 		
 		function draw(time) {
+			const timeDiff = time - lastTime;
+			lastTime = time;
 			ctx.clearRect(0, 0, settings.width, settings.height);
-			drawElements.filter(element => element.draw(time));
+			drawObjects = drawObjects.filter(object => object.draw(timeDiff));
 			requestAnimationFrame(draw);	
 		}
 		
