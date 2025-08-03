@@ -165,6 +165,7 @@ navigator.mediaDevices.getUserMedia({audio: false, video: {width: 1280, height: 
 		canvas.width = settings.width;
 		canvas.height = settings.height;
 		drawObjects.push(new Ball(hands, ctx, settings));
+		await hands.start(settings);
 		
 		let lastTime = performance.now();
 		
@@ -176,7 +177,6 @@ navigator.mediaDevices.getUserMedia({audio: false, video: {width: 1280, height: 
 			requestAnimationFrame(draw);	
 		}
 		
-		await hands.start(settings);
 		requestAnimationFrame(draw);
 	}, {once: true});
 	
