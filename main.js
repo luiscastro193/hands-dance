@@ -170,10 +170,10 @@ navigator.mediaDevices.getUserMedia({audio: false, video: {width: 1280, height: 
 		let lastTime = performance.now();
 		
 		function draw(time) {
-			const timeDiff = time - lastTime;
+			const elapsedTime = time - lastTime;
 			lastTime = time;
 			ctx.clearRect(0, 0, settings.width, settings.height);
-			drawObjects = drawObjects.filter(object => object.draw(timeDiff));
+			drawObjects = drawObjects.filter(object => object.draw(elapsedTime));
 			requestAnimationFrame(draw);	
 		}
 		
