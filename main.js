@@ -182,3 +182,18 @@ navigator.mediaDevices.getUserMedia({audio: false, video: {width: 1280, height: 
 	
 	video.srcObject = stream;
 });
+
+function autoHideCursor(element, timeout = 1000) {
+	let timer;
+	
+	function setTimer() {
+		element.style.cursor = '';
+		clearTimeout(timer);
+		timer = setTimeout(() => {element.style.cursor = 'none'}, timeout);
+	}
+	
+	element.addEventListener('mousemove', setTimer, {passive: true});
+	setTimer();
+}
+
+autoHideCursor(canvas);
