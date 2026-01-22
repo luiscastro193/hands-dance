@@ -74,8 +74,8 @@ const durationMean = .1;
 const durationDeviation = .025;
 let randomDuration = () => durationMean;
 
-import('https://luiscastro193.github.io/PRNG/distributions.js').then(module => {
-	randomDuration = module.toGamma(durationMean, durationDeviation, Math.random);
+import('https://luiscastro193.github.io/PRNG/PRNG.js').then(async module => {
+	randomDuration = await module.distribution('gamma', durationMean, durationDeviation, await module.generator());
 });
 
 function playSound() {
