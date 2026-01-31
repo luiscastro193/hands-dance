@@ -159,7 +159,9 @@ class Ball {
 const hands = new HandRects(video, canvas, ctx);
 drawObjects.push(hands);
 
-navigator.mediaDevices.getUserMedia({audio: false, video: {width: 1280, height: 720}}).then(stream => {
+navigator.mediaDevices.getUserMedia(
+	{audio: false, video: {facingMode: 'user', width: 1280, height: 720, resizeMode: 'crop-and-scale'}}
+).then(stream => {
 	video.addEventListener('play', async function() {
 		const settings = stream.getVideoTracks()[0].getSettings();
 		canvas.width = settings.width;
