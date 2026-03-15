@@ -1,4 +1,6 @@
 "use strict";
+import {FilesetResolver, HandLandmarker} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.mjs";
+
 const PI2 = Math.PI * 2;
 const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
@@ -13,59 +15,63 @@ function areColliding(rect, circle) {
 }
 
 class HandRects {
-	constructor(video, canvas, ctx) {
-		this.ctx = ctx;
+	constructor() {
 		this.rects = [];
-		
-		this.hands = new Hands({locateFile: file => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`});
-		this.hands.setOptions({
-			modelComplexity: 0,
-			maxNumHands: 4,
-			minDetectionConfidence: 0.3,
+		this.ready = this.init();
+	}
+
+	async init() {
+		const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm");
+
+		this.hands = await HandLandmarker.createFromOptions(vision, {
+			baseOptions: {
+				modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task",
+				delegate: "GPU"
+			},
+			runningMode: "VIDEO",
+			numHands: 4,
+			minHandDetectionConfidence: 0.3,
 			minTrackingConfidence: 0.2
 		});
-		this.ready = this.hands.send({image: canvas});
 	}
-	
+
 	async start(settings) {
 		const self = this;
-		this.settings = settings;
-		
+		self.settings = settings;
+
 		try {
-			await this.ready;
+			await self.ready;
 		}
 		catch(e) {
-			this.ctx.fillStyle = "red";
+			ctx.fillStyle = "red";
 			return console.error(e);
 		}
-		
-		this.hands.onResults(results => this.update(results));
-		
-		async function sendImage() {
-			await self.hands.send({image: video});
-			requestAnimationFrame(sendImage);	
+
+		function sendImage(time) {
+			self.update(self.hands.detectForVideo(video, time));
+			requestAnimationFrame(sendImage);
 		}
-		
+
 		requestAnimationFrame(sendImage);
 	}
-	
+
 	update(results) {
-		this.rects = results.multiHandLandmarks.map(landmarks => {
+		this.rects = results.landmarks.map(landmarks => {
 			let x = landmarks.map(mark => mark.x);
 			let y = landmarks.map(mark => mark.y);
 			let x_max = Math.max(...x) * this.settings.width;
 			let x_min = Math.min(...x) * this.settings.width;
 			let y_max = Math.max(...y) * this.settings.height;
 			let y_min = Math.min(...y) * this.settings.height;
-			
+
 			return [x_min, y_min, x_max - x_min, y_max - y_min];
 		});
 	}
-	
+
 	draw() {
 		for (let rect of this.rects)
-			this.ctx.strokeRect(...rect);
-		
+			ctx.strokeRect(...rect);
+
 		return true;
 	}
 }
@@ -88,9 +94,8 @@ function playSound() {
 const maxColor = 0xFFFFFF + 1;
 
 class Ball {
-	constructor(hands, ctx, settings) {
+	constructor(hands, settings) {
 		this.hands = hands;
-		this.ctx = ctx;
 		let diagonal = Math.sqrt(settings.width * settings.width + settings.height * settings.height);
 		this.radius = diagonal / 40;
 		this.x = settings.width / 2;
@@ -104,7 +109,7 @@ class Ball {
 	}
 	
 	changeColor() {
-		this.ctx.fillStyle = '#' + Math.trunc(Math.random() * maxColor).toString(16).padStart(6, '0');
+		ctx.fillStyle = '#' + Math.trunc(Math.random() * maxColor).toString(16).padStart(6, '0');
 	}
 	
 	collisionDirection(rect) {
@@ -148,15 +153,15 @@ class Ball {
 		
 		this.detectCollisions();
 		
-		this.ctx.beginPath();
-		this.ctx.arc(this.x, this.y, this.radius, 0, PI2);
-		this.ctx.fill();
+		ctx.beginPath();
+		ctx.arc(this.x, this.y, this.radius, 0, PI2);
+		ctx.fill();
 		
 		return true;
 	}
 }
 
-const hands = new HandRects(video, canvas, ctx);
+const hands = new HandRects();
 drawObjects.push(hands);
 
 navigator.mediaDevices.getUserMedia(
@@ -166,7 +171,7 @@ navigator.mediaDevices.getUserMedia(
 		const settings = stream.getVideoTracks()[0].getSettings();
 		canvas.width = settings.width;
 		canvas.height = settings.height;
-		drawObjects.push(new Ball(hands, ctx, settings));
+		drawObjects.push(new Ball(hands, settings));
 		await hands.start(settings);
 		
 		let lastTime = performance.now();
