@@ -4,6 +4,8 @@ const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
 const ctx = canvas.getContext('2d');
 const actx = new AudioContext();
+const compressor = new DynamicsCompressorNode(actx);
+compressor.connect(actx.destination);
 let drawObjects = [];
 
 function areColliding(rect, circle) {
@@ -82,7 +84,7 @@ import('https://luiscastro193.github.io/PRNG/PRNG.js').then(async module => {
 
 function playSound() {
 	let oscillator = actx.createOscillator();
-	oscillator.connect(actx.destination);
+	oscillator.connect(compressor);
 	oscillator.start();
 	oscillator.stop(actx.currentTime + randomDuration());
 }
