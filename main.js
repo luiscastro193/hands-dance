@@ -1,6 +1,4 @@
 "use strict";
-import {FilesetResolver, HandLandmarker} from "https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/vision_bundle.mjs";
-
 const PI2 = Math.PI * 2;
 const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
@@ -17,28 +15,18 @@ function areColliding(rect, circle) {
 class HandRects {
 	constructor() {
 		this.rects = [];
-		this.ready = this.init();
-	}
-
-	async init() {
-		const vision = await FilesetResolver.forVisionTasks("https://cdn.jsdelivr.net/npm/@mediapipe/tasks-vision/wasm");
-
-		this.hands = await HandLandmarker.createFromOptions(vision, {
-			baseOptions: {
-				modelAssetPath: "https://storage.googleapis.com/mediapipe-models/hand_landmarker/hand_landmarker/float16/latest/hand_landmarker.task",
-				delegate: "GPU"
-			},
-			runningMode: "VIDEO",
-			numHands: 4,
-			minHandDetectionConfidence: 0.3,
-			minTrackingConfidence: 0.2
+		const worker = new Worker("worker.js");
+		this.worker = worker;
+		this.ready = new Promise((resolve, reject) => {
+			worker.addEventListener('message', () => resolve(), {once: true});
+			worker.addEventListener('error', e => reject(e), {once: true});
 		});
 	}
-
+	
 	async start(settings) {
 		const self = this;
 		self.settings = settings;
-
+		
 		try {
 			await self.ready;
 		}
@@ -46,35 +34,43 @@ class HandRects {
 			ctx.fillStyle = "red";
 			return console.error(e);
 		}
-
+		
 		function sendImage(time) {
-			self.update(self.hands.detectForVideo(video, time));
-			requestAnimationFrame(sendImage);
+			const frame = new VideoFrame(video, {timestamp: time * 1000});
+			self.worker.postMessage(frame, [frame]);
 		}
-
+		
+		self.worker.addEventListener('message', event => {
+			self.update(event.data);
+			requestAnimationFrame(sendImage);
+		});
+		
 		requestAnimationFrame(sendImage);
 	}
-
-	update(results) {
-		this.rects = results.landmarks.map(landmarks => {
+	
+	update(landmarks) {
+		this.rects = landmarks.map(landmarks => {
 			let x = landmarks.map(mark => mark.x);
 			let y = landmarks.map(mark => mark.y);
 			let x_max = Math.max(...x) * this.settings.width;
 			let x_min = Math.min(...x) * this.settings.width;
 			let y_max = Math.max(...y) * this.settings.height;
 			let y_min = Math.min(...y) * this.settings.height;
-
+			
 			return [x_min, y_min, x_max - x_min, y_max - y_min];
 		});
 	}
-
+	
 	draw() {
 		for (let rect of this.rects)
 			ctx.strokeRect(...rect);
-
+		
 		return true;
 	}
 }
+
+const hands = new HandRects();
+drawObjects.push(hands);
 
 const durationMean = .1;
 const durationDeviation = .025;
@@ -94,8 +90,7 @@ function playSound() {
 const maxColor = 0xFFFFFF + 1;
 
 class Ball {
-	constructor(hands, settings) {
-		this.hands = hands;
+	constructor(settings) {
 		let diagonal = Math.sqrt(settings.width * settings.width + settings.height * settings.height);
 		this.radius = diagonal / 40;
 		this.x = settings.width / 2;
@@ -121,7 +116,7 @@ class Ball {
 	}
 	
 	detectCollisions() {
-		for (let handRect of this.hands.rects) {
+		for (let handRect of hands.rects) {
 			if (areColliding(handRect, this))
 				return this.collisionDirection(handRect);
 		}
@@ -161,9 +156,6 @@ class Ball {
 	}
 }
 
-const hands = new HandRects();
-drawObjects.push(hands);
-
 navigator.mediaDevices.getUserMedia(
 	{audio: false, video: {facingMode: 'user', width: 1280, height: 720, resizeMode: 'crop-and-scale'}}
 ).then(stream => {
@@ -171,7 +163,7 @@ navigator.mediaDevices.getUserMedia(
 		const settings = stream.getVideoTracks()[0].getSettings();
 		canvas.width = settings.width;
 		canvas.height = settings.height;
-		drawObjects.push(new Ball(hands, settings));
+		drawObjects.push(new Ball(settings));
 		await hands.start(settings);
 		
 		let lastTime = performance.now();
