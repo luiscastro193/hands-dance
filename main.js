@@ -85,6 +85,7 @@ import('https://luiscastro193.github.io/PRNG/PRNG.js').then(async module => {
 
 function playSound() {
 	let oscillator = actx.createOscillator();
+	oscillator.frequency.value = 329.63;
 	oscillator.connect(compressor);
 	oscillator.start();
 	oscillator.stop(actx.currentTime + randomDuration());
