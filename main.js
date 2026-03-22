@@ -85,10 +85,13 @@ import('https://luiscastro193.github.io/PRNG/PRNG.js').then(async module => {
 
 function playSound() {
 	let oscillator = actx.createOscillator();
+	let gain = actx.createGain();
+	let duration = randomDuration();
 	oscillator.frequency.value = 329.63;
-	oscillator.connect(compressor);
+	gain.gain.setTargetAtTime(0, actx.currentTime, duration);
+	oscillator.connect(gain).connect(compressor);
 	oscillator.start();
-	oscillator.stop(actx.currentTime + randomDuration());
+	oscillator.stop(actx.currentTime + duration * 5);
 }
 
 class Ball {
