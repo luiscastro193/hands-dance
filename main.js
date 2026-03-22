@@ -90,8 +90,6 @@ function playSound() {
 	oscillator.stop(actx.currentTime + randomDuration());
 }
 
-const maxColor = 0xFFFFFF + 1;
-
 class Ball {
 	constructor(settings) {
 		let diagonal = Math.sqrt(settings.width * settings.width + settings.height * settings.height);
@@ -107,7 +105,7 @@ class Ball {
 	}
 	
 	changeColor() {
-		ctx.fillStyle = '#' + Math.trunc(Math.random() * maxColor).toString(16).padStart(6, '0');
+		ctx.fillStyle = `oklab(${Math.random()} ${Math.random() * .8 - .4} ${Math.random() * .8 - .4})`;
 	}
 	
 	collisionDirection(rect) {
