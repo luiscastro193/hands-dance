@@ -1,4 +1,5 @@
 "use strict";
+const cameraErrorMsg = "Camera access is required. Please allow camera permissions and reload the page.";
 const PI2 = Math.PI * 2;
 const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
@@ -182,7 +183,7 @@ navigator.mediaDevices.getUserMedia(
 	}, {once: true});
 	
 	video.srcObject = stream;
-});
+}).catch(() => {document.body.innerHTML = `<p style="color: white">${cameraErrorMsg}</p>`});
 
 function autoHideCursor(element, timeout = 1000) {
 	let timer;
