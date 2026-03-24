@@ -75,7 +75,7 @@ class HandRects {
 const hands = new HandRects();
 drawObjects.push(hands);
 
-const durationMean = .1;
+const durationMean = .075;
 const durationDeviation = .025;
 let randomDuration = () => durationMean;
 
