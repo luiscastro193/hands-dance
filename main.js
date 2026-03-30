@@ -75,6 +75,14 @@ class HandRects {
 const hands = new HandRects();
 drawObjects.push(hands);
 
+let inGamut = color => true;
+
+import('https://colorjs.io/dist/color.min.js').then(module => {
+	const gamut = matchMedia('(color-gamut: rec2020)').matches ? 'rec2020'
+		: matchMedia('(color-gamut: p3)').matches ? 'p3' : 'srgb';
+	inGamut = color => new module.default(color).inGamut(gamut);
+});
+
 const durationMean = .075;
 const durationDeviation = .025;
 let randomDuration = () => durationMean;
@@ -109,7 +117,9 @@ class Ball {
 	}
 	
 	changeColor() {
-		ctx.fillStyle = `oklab(${Math.random()} ${Math.random() * .8 - .4} ${Math.random() * .8 - .4})`;
+		do {
+			ctx.fillStyle = `oklab(${Math.random()} ${Math.random() - .5} ${Math.random() - .5})`;
+		} while (!inGamut(ctx.fillStyle));
 	}
 	
 	collisionDirection(rect) {
