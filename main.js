@@ -117,9 +117,13 @@ class Ball {
 	}
 	
 	changeColor() {
+		let color;
+		
 		do {
-			ctx.fillStyle = `oklab(${Math.random()} ${Math.random() - .5} ${Math.random() - .5})`;
-		} while (!inGamut(ctx.fillStyle));
+			color = `oklab(${Math.random()} ${Math.random() - .5} ${Math.random() - .5})`;
+		} while (!inGamut(color));
+		
+		ctx.fillStyle = color;
 	}
 	
 	collisionDirection(rect) {
