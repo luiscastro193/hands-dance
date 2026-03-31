@@ -3,7 +3,8 @@ const cameraErrorMsg = "Camera access is required. Please allow camera permissio
 const PI2 = Math.PI * 2;
 const video = document.querySelector('video');
 const canvas = document.querySelector('canvas');
-const ctx = canvas.getContext('2d');
+const gamut = matchMedia('(color-gamut: p3)').matches ? 'p3' : 'srgb';
+const ctx = canvas.getContext('2d', {colorSpace: gamut == 'p3' ? 'display-p3' : 'srgb'});
 const actx = new AudioContext();
 const compressor = new DynamicsCompressorNode(actx);
 compressor.connect(actx.destination);
@@ -78,8 +79,6 @@ drawObjects.push(hands);
 let inGamut = color => true;
 
 import('https://colorjs.io/dist/color.min.js').then(module => {
-	const gamut = matchMedia('(color-gamut: rec2020)').matches ? 'rec2020'
-		: matchMedia('(color-gamut: p3)').matches ? 'p3' : 'srgb';
 	inGamut = color => new module.default(color).inGamut(gamut);
 });
 
