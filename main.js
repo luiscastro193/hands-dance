@@ -85,8 +85,8 @@ import('https://colorjs.io/dist/color.min.js').then(module => {
 	};
 });
 
-const durationMean = .075;
-const durationDeviation = .025;
+const durationMean = .07;
+const durationDeviation = .02;
 let randomDuration = () => durationMean;
 
 import('https://luiscastro193.github.io/PRNG/PRNG.js').then(async module => {
