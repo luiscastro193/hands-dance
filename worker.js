@@ -23,4 +23,4 @@ import(moduleUrl).then(async ({FilesetResolver, HandLandmarker}) => {
 		postMessage(hands.detectForVideo(frame, frame.timestamp / 1000).landmarks);
 		frame.close();
 	};
-}).catch(reportError);
+}).catch(error => setTimeout(() => {throw error}));
